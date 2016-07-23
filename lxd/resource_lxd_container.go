@@ -77,7 +77,6 @@ func resourceLxdContainer() *schema.Resource {
 func resourceLxdContainerCreate(d *schema.ResourceData, meta interface{}) error {
 	var err error
 	client := meta.(*LxdProvider).Client
-	remote := meta.(*LxdProvider).Remote
 
 	name := d.Get("name").(string)
 	ephem := d.Get("ephemeral").(bool)
@@ -94,9 +93,11 @@ func resourceLxdContainerCreate(d *schema.ResourceData, meta interface{}) error 
 		}
 	}
 
+	imgRemote, imgName := meta.(*LxdProvider).ParseRemoteAndContainer(d.Get("image").(string))
+
 	//client.Init = (name string, imgremote string, image string, profiles *[]string, config map[string]string, ephem bool)
 	var resp *lxd.Response
-	if resp, err = client.Init(name, remote, d.Get("image").(string), &profiles, nil, nil, ephem); err != nil {
+	if resp, err = client.Init(name, imgRemote, imgName, &profiles, nil, nil, ephem); err != nil {
 		return err
 	}
 

@@ -9,6 +9,7 @@ import (
 	"github.com/lxc/lxd"
 	"github.com/lxc/lxd/shared"
 	"os"
+	"strings"
 )
 
 type LxdProvider struct {
@@ -128,4 +129,12 @@ func validateClient(client *lxd.Client) error {
 		return err
 	}
 	return nil
+}
+
+func (c *LxdProvider) ParseRemoteAndContainer(raw string) (string, string) {
+	result := strings.SplitN(raw, ":", 2)
+	if len(result) == 1 {
+		return c.Remote, result[0]
+	}
+	return result[0], result[1]
 }
